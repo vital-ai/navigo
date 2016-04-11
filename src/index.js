@@ -96,9 +96,18 @@ Navigo.prototype = {
     clean
   },
   navigate: function (path, absolute) {
+    var connector = '/';
+    var rl = this._getRoot();
+    var pushed = null;
+
     path = path || '';
     if (this._ok) {
-      history.pushState({}, '', (!absolute ? this._getRoot() + '/' : '') + clean(path));
+      // avoid double slashes
+      if (rl.substring(rl.length - 1) === '/' || (path.length > 0 && path.substring(0, 1) === '/')) {
+        connector = '';
+      }
+      pushed = (!absolute ? rl + connector : '') + clean(path);
+      history.pushState({}, '', pushed);
       this.resolve();
     } else if (typeof window !== 'undefined') {
       window.location.href = window.location.href.replace(/#(.*)$/, '') + '#' + path;
